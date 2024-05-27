@@ -12,6 +12,7 @@ load_dotenv()
 TOKEN = environ["TOKEN"]
 OSU_ID = environ["OSU-ID"]
 OSU_SECRET = environ["OSU-SECRET"]
+OSU_CALLBACK = environ["OSU-CALLBACK"]
 
 if TOKEN is None:
     logger.error("No discord token provided on environment variables.")
@@ -22,7 +23,7 @@ if OSU_ID is None or OSU_SECRET is None:
     exit()
 
 bot = commands.InteractionBot()
-osu = ossapi.OssapiAsync(OSU_ID, OSU_SECRET, scopes=[ossapi.Scope.PUBLIC])
+osu = ossapi.OssapiAsync(OSU_ID, OSU_SECRET, OSU_CALLBACK)
 
 @bot.event
 async def on_ready():
@@ -32,5 +33,11 @@ async def on_ready():
     logger.info(f"Python version: {python_version()}")
     logger.info(f"Disnake package version: {disnake.__version__}")
     logger.info("=" * 30)
+
+    user = await osu.user("peppy")
+    if user.id == 2:
+        logger.info("Connected to Osu! api")
+    else:
+        logger.error("There was an error connecting to the osu! api")
 
 bot.run(TOKEN)

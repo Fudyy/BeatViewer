@@ -3,12 +3,8 @@ from ossapi import Beatmapset, Beatmap, GameMode
 from ossapi.enums import RankStatus
 from main import osu
 
-def create(map: Beatmap, mapset: Beatmapset = None):
-    beatmapset = None
-    if mapset:
-        beatmapset = mapset
-    else:
-        beatmapset = map._beatmapset
+def create(map: Beatmap, beatmapset: Beatmapset):
+
     embed = Embed()
 
     # Drain time convertor
@@ -38,12 +34,24 @@ def create(map: Beatmap, mapset: Beatmapset = None):
     **⭐ SR: ``{map.difficulty_rating}`` | ⌛Drain time: ``{formatted_drain_time}`` | 🎶 BPM: ``{beatmapset.bpm}``**
     """
     # Fields section
+    # diff settings
     diff_settings_str = f"""
     AR: ``{map.ar}`` CS: ``{map.cs}``
     HP: ``{map.drain}`` OD: ``{map.accuracy}``
     """
     embed.add_field("Diff settings:", diff_settings_str, inline=True)
-    embed.add_field("", "", inline=True)
+
+    # Nominators
+    if beatmapset.current_nominations:
+        nominators = []
+        for nomination in beatmapset.current_nominations:
+            for related_user in beatmapset.related_users:
+                if related_user["id"] == nomination.user_id:
+                    nominators.append(related_user["username"])
+
+        embed.add_field("Nominators:", ", ".join(nominators), inline=True)
+
+
     if beatmapset.source:
         embed.add_field("Source:", beatmapset.source, inline=True)
     else:

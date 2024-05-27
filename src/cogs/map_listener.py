@@ -31,7 +31,7 @@ class MapListener(commands.Cog):
                     beatmap = next((bm for bm in mapset.beatmaps if bm.id == int(map_id)), None)
                     # prevent to show a difficulty that doesn't exists (yeah i know that more than someone is gonna hard test the bot)
                     if beatmap:
-                        await message.reply(embed=map_info.create(beatmap, mapset=mapset))
+                        await message.reply(embed=map_info.create(beatmap, mapset))
                     else:
                         return
                 except:
@@ -42,7 +42,7 @@ class MapListener(commands.Cog):
                 try:
                     mapset = await osu.beatmapset(beatmapset_id=set_id)
                     beatmap = max(mapset.beatmaps, key=lambda b: b.difficulty_rating)
-                    await message.reply(embed=map_info.create(beatmap, mapset=mapset))
+                    await message.reply(embed=map_info.create(beatmap, mapset))
                 except:
                     pass
             

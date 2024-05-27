@@ -1,6 +1,7 @@
-from disnake import Embed
+from disnake import Embed, Colour
 from ossapi import Beatmapset, Beatmap, GameMode
 from ossapi.enums import RankStatus
+from Pylette import extract_colors, Palette, Color
 
 def create(map: Beatmap, beatmapset: Beatmapset):
 
@@ -14,6 +15,16 @@ def create(map: Beatmap, beatmapset: Beatmapset):
     embed.set_image(
         url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg"
     )
+
+    # color
+    bg_color_extract: Color = extract_colors(
+        image_url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg",
+        palette_size=4,
+        resize=True
+        )[0]
+    
+    bg_color = Colour.from_rgb(int(bg_color_extract.rgb[0]), int(bg_color_extract.rgb[1]), int(bg_color_extract.rgb[2]))
+    embed.color = bg_color
 
     #Author section
     embed.set_author(

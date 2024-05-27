@@ -2,6 +2,7 @@ import disnake
 from os import environ
 from dotenv import load_dotenv
 from disnake.ext import commands
+import ossapi.ossapiv2_async
 from logger.logger import logger
 from platform import python_version
 import ossapi
@@ -22,7 +23,9 @@ if OSU_ID is None or OSU_SECRET is None:
     logger.error("No osu oauth credentials provided on environment variables.")
     exit()
 
-bot = commands.InteractionBot()
+intents = disnake.Intents.default()
+intents.message_content = True
+bot = commands.InteractionBot(test_guilds=[1203814447295107152], intents=intents)
 osu = ossapi.OssapiAsync(OSU_ID, OSU_SECRET, OSU_CALLBACK)
 
 @bot.event
@@ -39,5 +42,8 @@ async def on_ready():
         logger.info("Connected to Osu! api")
     else:
         logger.error("There was an error connecting to the osu! api")
+
+
+bot.load_extension("cogs.map_listener")
 
 bot.run(TOKEN)

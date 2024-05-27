@@ -29,10 +29,11 @@ def create(map: Beatmap, beatmapset: Beatmapset):
     embed.description = f"""
     **❤️ Favs: ``{beatmapset.favourite_count}`` | ▶️ Playcounts: ``{beatmapset.play_count}``**
      
-    🟤 **{map.version}**
+    {get_emoji(map.difficulty_rating, map.mode)} **{map.version}**
    
     **⭐ SR: ``{map.difficulty_rating}`` | ⌛Drain time: ``{formatted_drain_time}`` | 🎶 BPM: ``{beatmapset.bpm}``**
     """
+
     # Fields section
     # diff settings
     diff_settings_str = f"""
@@ -55,7 +56,7 @@ def create(map: Beatmap, beatmapset: Beatmapset):
     if beatmapset.source:
         embed.add_field("Source:", beatmapset.source, inline=True)
     else:
-        embed.add_field("Source:", "Not specified", inline=True)
+        embed.add_field("Source:", "Unspecified", inline=True)
 
     embed.add_field("Genre:", beatmapset.genre["name"], inline=True)
     embed.add_field("Language:", beatmapset.language["name"], inline=True)
@@ -64,7 +65,7 @@ def create(map: Beatmap, beatmapset: Beatmapset):
         gamemode_name = "osu!"
     elif map.mode == GameMode.TAIKO:
         gamemode_name = "Taiko"
-    elif map.mode == GameMode.CTB:
+    elif map.mode == GameMode.CATCH:
         gamemode_name = "Catch the Beat"
     elif map.mode == GameMode.MANIA:
         gamemode_name = "Mania"
@@ -93,3 +94,59 @@ def create(map: Beatmap, beatmapset: Beatmapset):
     embed.timestamp = beatmapset.last_updated
 
     return embed
+
+def get_emoji(difficulty_rating: float, gamemode: GameMode):
+    emojis = []
+    if gamemode == GameMode.OSU:
+        emojis = [
+            "<:std_1:1244766827134058636>", 
+            "<:std_2:1244766789217419284>", 
+            "<:std_3:1244766788261253140>", 
+            "<:std_4:1244766787174793237>", 
+            "<:std_5:1244766785216188499>", 
+            "<:std_6:1244766784503025835>", 
+            "<:std_7:1244766783160717353>", 
+            "<:std_8:1244766781889974323>", 
+            "<:std_9:1244766780447264808>"
+        ]
+    elif gamemode == GameMode.TAIKO:
+        emojis = [
+            "<:taiko_1:1244775746497679391>",
+            "<:taiko_2:1244775734862417981>",
+            "<:taiko_3:1244775732836569130>",
+            "<:taiko_4:1244775731678941284>",
+            "<:taiko_5:1244775730546737163>",
+            "<:taiko_6:1244775729057497098>",
+            "<:taiko_7:1244775727635632138>",
+            "<:taiko_8:1244775726411026512>",
+            "<:taiko_9:1244775724993220680>"
+        ]
+    elif gamemode == GameMode.CATCH:
+        emojis = [
+            "<:ctb_1:1244774445109870633>",
+            "<:ctb_2:1244774423677112381>",
+            "<:ctb_3:1244774422615687338>",
+            "<:ctb_4:1244774421407994019>",
+            "<:ctb_5:1244774419768016937>",
+            "<:ctb_6:1244774418530439251>",
+            "<:ctb_7:1244774417683316818>",
+            "<:ctb_8:1244774416441802882>",
+            "<:ctb_9:1244774415149830226>"
+        ]
+    elif gamemode == GameMode.MANIA:
+        emojis = [
+            "<:mania_1:1244775165880045618>", 
+            "<:mania_2:1244775149404946474>",
+            "<:mania_3:1244775148335141044>", 
+            "<:mania_4:1244775146879713302>", 
+            "<:mania_5:1244775145822879824>", 
+            "<:mania_6:1244775144765919344>", 
+            "<:mania_7:1244775143008505937>", 
+            "<:mania_8:1244775141934759988>", 
+            "<:mania_9:1244775140802297987>"
+        ]
+
+
+    if difficulty_rating >= 9:
+        return emojis[-1]
+    return emojis[int(difficulty_rating)-1]

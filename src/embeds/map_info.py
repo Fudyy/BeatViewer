@@ -1,7 +1,6 @@
 from disnake import Embed
 from ossapi import Beatmapset, Beatmap, GameMode
 from ossapi.enums import RankStatus
-from main import osu
 
 def create(map: Beatmap, beatmapset: Beatmapset):
 
@@ -31,7 +30,7 @@ def create(map: Beatmap, beatmapset: Beatmapset):
      
     {get_emoji(map.difficulty_rating, map.mode)} **{map.version}**
    
-    **⭐ SR: ``{map.difficulty_rating}`` | ⌛Drain time: ``{formatted_drain_time}`` | 🎶 BPM: ``{beatmapset.bpm}``**
+    **⭐ SR: ``{map.difficulty_rating}`` | ⏱️ Drain time: ``{formatted_drain_time}`` | 🎶 BPM: ``{beatmapset.bpm}``**
     """
 
     # Fields section
@@ -54,7 +53,7 @@ def create(map: Beatmap, beatmapset: Beatmapset):
     else:
         embed.add_field("", "", inline=True)
 
-
+    # Source
     if beatmapset.source:
         embed.add_field("Source:", beatmapset.source, inline=True)
     else:
@@ -63,6 +62,7 @@ def create(map: Beatmap, beatmapset: Beatmapset):
     embed.add_field("Genre:", beatmapset.genre["name"], inline=True)
     embed.add_field("Language:", beatmapset.language["name"], inline=True)
 
+    # Gamemode
     if map.mode == GameMode.OSU:
         gamemode_name = "osu!"
     elif map.mode == GameMode.TAIKO:

@@ -49,9 +49,9 @@ def create(map: Beatmap, mapset: Beatmapset = None):
     else:
         embed.add_field("Source:", "Not specified", inline=True)
 
-    embed.add_field("Genre:", beatmapset.genre, inline=True)
-    embed.add_field("Language:", beatmapset.language, inline=True)
-
+    embed.add_field("Genre:", beatmapset.genre["name"], inline=True)
+    embed.add_field("Language:", beatmapset.language["name"], inline=True)
+    
     if map.mode == GameMode.OSU:
         gamemode_name = "osu! standard"
     elif map.mode == GameMode.TAIKO:

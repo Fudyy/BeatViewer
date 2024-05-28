@@ -21,8 +21,9 @@ def create(map: Beatmap, beatmapset: Beatmapset) -> Embed:
     bg_color_extract: Color = extract_colors(
         image_url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg",
         palette_size=10,
-        resize=True,
-        mode="MC"
+        resize=False,
+        mode="MC",
+        sort_mode="frequency"
     )[0]
     
     bg_color = Colour.from_rgb(int(bg_color_extract.rgb[0]), int(bg_color_extract.rgb[1]), int(bg_color_extract.rgb[2]))

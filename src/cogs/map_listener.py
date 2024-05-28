@@ -1,12 +1,15 @@
+import re
 from disnake.ext import commands
 from disnake import Message
-import re
 from logger.logger import logger
 from main import osu
 from embeds import map_info
 
 class MapListener(commands.Cog):
-    """Listens if a link of a beatmapset is sent on a message"""
+    """
+    Listens if a link of a beatmapset is sent on a message.
+    if the link is sent it will send an embed with the information of the beatmapset.
+    """
 
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot

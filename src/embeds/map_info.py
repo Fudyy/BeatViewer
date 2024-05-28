@@ -4,6 +4,9 @@ from ossapi.enums import RankStatus
 from Pylette import extract_colors, Color
 
 def create(map: Beatmap, beatmapset: Beatmapset) -> Embed:
+    """
+    Create an embed with information about the given beatmap and beatmapset.
+    """
     embed = Embed()
 
     # Convert drain time to minutes and seconds
@@ -102,6 +105,9 @@ def create(map: Beatmap, beatmapset: Beatmapset) -> Embed:
 from ossapi import GameMode
 
 def get_diff_emoji(difficulty_rating: float, gamemode: GameMode) -> str:
+    """
+    Get the emoji corresponding to the given difficulty rating and game mode.
+    """
     # Dictionary to map game modes to their corresponding emoji lists
     emojis = {
         GameMode.OSU: [

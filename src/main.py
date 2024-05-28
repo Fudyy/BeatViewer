@@ -1,11 +1,10 @@
 import disnake
+import ossapi
 from os import environ
 from dotenv import load_dotenv
 from disnake.ext import commands
-import ossapi.ossapiv2_async
 from logger.logger import logger
 from platform import python_version
-import ossapi
 from sys import exit
 
 load_dotenv()

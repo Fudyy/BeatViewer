@@ -16,6 +16,8 @@ def create(map: Beatmap, beatmapset: Beatmapset):
         url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg"
     )
 
+    embed.set_thumbnail(url=f"https://a.ppy.sh/{beatmapset.user_id}")
+
     # color
     bg_color_extract: Color = extract_colors(
         image_url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg",
@@ -40,16 +42,18 @@ def create(map: Beatmap, beatmapset: Beatmapset):
     embed.description = f"""
     **❤️ Favs: ``{beatmapset.favourite_count}`` | ▶️ Playcounts: ``{beatmapset.play_count}``**
      
-    {get_emoji(map.difficulty_rating, map.mode)} **{map.version}**
+    {get_emoji(map.difficulty_rating, map.mode)} **{map.version}** ``{map.difficulty_rating}`` ⭐
    
-    **⭐ SR: ``{map.difficulty_rating}`` | ⏱️ Drain time: ``{formatted_drain_time}`` | 🎶 BPM: ``{beatmapset.bpm}``**
+    **⏱️ Drain time: ``{formatted_drain_time}`` | 🎶 BPM: ``{beatmapset.bpm}``**
     """
 
     # Fields section
     # diff settings
     diff_settings_str = f"""
-    AR: ``{map.ar}`` CS: ``{map.cs}``
-    HP: ``{map.drain}`` OD: ``{map.accuracy}``
+    AR: ``{map.ar}`` 
+    CS: ``{map.cs}``
+    HP: ``{map.drain}`` 
+    OD: ``{map.accuracy}``
     """
     embed.add_field("Diff settings:", diff_settings_str, inline=True)
 

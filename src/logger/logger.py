@@ -1,9 +1,9 @@
 import logging
 
-logger = logging.getLogger("Mapperializer")
+logger = logging.getLogger("BeatViewer")
 logger.setLevel(logging.DEBUG)
 
-fmt = "\033[33m[\033[0m\033[32mMapperializer\033[33m]\033[0m"
+fmt = "\033[33m[\033[0m\033[32mBeatViewer\033[33m]\033[0m"
 
 formatter = logging.Formatter(f"{fmt} \033[90m%(asctime)s\033[0m: %(levelname)s %(message)s",
                               datefmt="%Y-%m-%d %H:%M:%S")

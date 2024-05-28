@@ -62,7 +62,7 @@ def create(map: Beatmap, beatmapset: Beatmapset) -> Embed:
                     nominators.append(related_user["username"])
         embed.add_field(name="Nominators:", value=", ".join(nominators), inline=True)
     else:
-        embed.add_field(name="Nominators:", value="None", inline=True)
+        embed.add_field(name="", value="", inline=True)
 
     # Add field for source if specified
     source = beatmapset.source if beatmapset.source else "Unspecified"

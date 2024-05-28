@@ -32,9 +32,10 @@ class MapListener(commands.Cog):
                     # prevent to show a difficulty that doesn't exists (yeah i know that more than someone is gonna hard test the bot)
                     if beatmap:
                         logger.info(f"Sending map info:  MAP ID: {beatmap.id} | CHANNEL: {message.channel.id}")
-                        await message.reply(embed=map_info.create(beatmap, mapset))
-                    else:
-                        return
+                        try:
+                            await message.reply(embed=map_info.create(beatmap, mapset))
+                        except Exception as e:
+                            logger.error(f"There was an error sending the map info: {e}")
                 except:
                     pass
             # if the link only have the mapset id it uses the highest difficulty to show up
@@ -44,7 +45,10 @@ class MapListener(commands.Cog):
                     mapset = await osu.beatmapset(beatmapset_id=set_id)
                     beatmap = max(mapset.beatmaps, key=lambda b: b.difficulty_rating)
                     logger.info(f"Sending map info:  MAP ID: {beatmap.id} | CHANNEL: {message.channel.id}")
-                    await message.reply(embed=map_info.create(beatmap, mapset))
+                    try:
+                        await message.reply(embed=map_info.create(beatmap, mapset))
+                    except Exception as e:
+                        logger.error(f"There was an error sending the map info: {e}")
                 except:
                     pass
             

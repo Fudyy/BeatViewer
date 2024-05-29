@@ -1,5 +1,5 @@
 import io
-from disnake import Attachment, Embed, File, ApplicationCommandInteraction as Interaction
+from disnake import Attachment, Embed, File, OptionChoice, ApplicationCommandInteraction as Interaction
 from disnake.ext import commands
 from PIL import Image, ImageDraw
 from Pylette import extract_colors, Palette
@@ -14,13 +14,27 @@ class ComboColor(commands.Cog):
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
 
-    @commands.slash_command(name="combocolors",
-                            description="Gets the color palette from an image to use as combo colors on a beatmap.",)
-    async def combo_colors(self, 
-                           ctx: Interaction, 
-                           image: Attachment = commands.Param(description="The image to use, it must be a PNG/JPEG"), 
-                           colors: int = commands.Param(default=4, 
-                                                        description="The number of colors to extract from the image (10 max).")):
+    @commands.slash_command(
+        name="combocolors",
+        description="Gets the color palette from an image to use as combo colors on a beatmap.",
+    )
+    async def combo_colors(
+        self,
+        ctx: Interaction,
+        image: Attachment = commands.Param(description="The image to use, it must be a PNG/JPEG"),
+        colors: int = commands.Param(
+            default=4,
+            description="The number of colors to extract from the image (10 max)."
+        ),
+        sort_mode: str = commands.Param(
+            choices=[
+                OptionChoice(name="Frequency", value="frequency"),
+                OptionChoice(name="Luminance", value="luminance")
+            ],
+            default="frequency",
+            description="The color sorting mode of the palette. (default: frequency)"
+        ),
+    ):
         """
         Gets the color palette from an image to use as combo colors on a beatmap.
         """
@@ -37,7 +51,7 @@ class ComboColor(commands.Cog):
             palette_size=colors,
             resize=True,
             mode="MC",
-            sort_mode="frequency"
+            sort_mode=sort_mode
         )
 
         palette_image = generate_palette_image(color_palette)

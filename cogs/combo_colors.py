@@ -45,7 +45,7 @@ class ComboColor(commands.Cog):
         palette_image.save(image_byte_array, format="PNG")
         image_byte_array.seek(0)
         image_file = File(image_byte_array, filename="palette.png")
-        await ctx.send(embed=Embed().set_image(file=image_file))
+        await ctx.send(embed=Embed().set_image(file=image_file).set_thumbnail(url=image.url))
 
 
 def setup(bot: commands.InteractionBot):
@@ -78,6 +78,7 @@ def generate_palette_image(palette: Palette) -> Image.Image:
             hitcircle = generate_hitcircle(color.rgb, i+1)
             color_center = (i * color_width) + color_width // 2
             img.paste(hitcircle, (color_center - 128, (color_height//3)), mask=hitcircle)
+            
     else:
         # If the palette has more than 5 colors, draw the first 5 colors on the top half of the image and the rest on the bottom half
         top_color_width = IMAGE_WIDTH // 5
@@ -95,7 +96,7 @@ def generate_palette_image(palette: Palette) -> Image.Image:
 
                 hitcircle = generate_hitcircle(color.rgb, i+1)
                 color_center = (i * top_color_width) + top_color_width // 2
-                img.paste(hitcircle, (color_center - 128, 0), mask=hitcircle)
+                img.paste(hitcircle, (color_center - 128, (color_height // 2) - 128), mask=hitcircle)
 
             # Bottom half
             else:
@@ -106,7 +107,7 @@ def generate_palette_image(palette: Palette) -> Image.Image:
                 
                 hitcircle = generate_hitcircle(color.rgb, i+1)
                 color_center = ((i - 5) * bottom_color_width) + bottom_color_width // 2
-                img.paste(hitcircle, (color_center - 128, color_height), mask=hitcircle)
+                img.paste(hitcircle, (color_center - 128, ((color_height // 2) * 3) - 128), mask=hitcircle)
 
     return img
 

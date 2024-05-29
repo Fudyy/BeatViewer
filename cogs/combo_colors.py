@@ -1,5 +1,5 @@
 import io
-from disnake import Attachment, Embed, File, OptionChoice, ApplicationCommandInteraction as Interaction
+from disnake import Attachment, Embed, File, OptionChoice, Colour, ApplicationCommandInteraction as Interaction
 from disnake.ext import commands
 from PIL import Image, ImageDraw
 from Pylette import extract_colors, Palette
@@ -54,12 +54,52 @@ class ComboColor(commands.Cog):
             sort_mode=sort_mode
         )
 
-        await ctx.send(embed=Embed().set_image(file=generate_palette_image(color_palette)).set_thumbnail(url=image.url))
+        await ctx.send(embed=generate_embed(color_palette, image.url, sort_mode))
 
 
 def setup(bot: commands.InteractionBot):
     bot.add_cog(ComboColor(bot))
 
+def generate_embed(color_palette: Palette, original_image_url: str, sort_mode: str) -> Embed:
+    """
+    Generate an embed containing the color palette image.
+    """
+
+    embed = Embed(
+        title="🎨 Combo Color Palette 🎨",
+        color= Colour.from_rgb(color_palette[0].rgb[0], color_palette[0].rgb[1], color_palette[0].rgb[2]),
+    )
+
+    color_index = ""
+    color_rgb = ""
+    color_hex = ""
+
+    for i, color in enumerate(color_palette.colors):
+        color_index += f"Color {i+1}: \n"
+        color_rgb += f"({color.rgb[0]}, {color.rgb[1]}, {color.rgb[2]})\n"
+        color_hex += f"{rgb_to_hex(color.rgb)}\n"
+
+    embed.add_field(name="Colors:", value=color_index, inline=True)
+    embed.add_field(name="RGB:", value=color_rgb, inline=True)
+    embed.add_field(name="Hex:", value=color_hex, inline=True)
+
+    palette_image = generate_palette_image(color_palette)
+    embed.set_image(file=palette_image)
+    embed.set_thumbnail(url=original_image_url)
+
+    embed.set_footer(text=f"Palette sorted by {sort_mode}")
+
+    return embed
+
+def rgb_to_hex(rgb: tuple) -> str:
+    """
+    Convert RGB color to hexadecimal color.
+    """
+
+    r, g, b = rgb
+    hex_color = f"#{r:02x}{g:02x}{b:02x}"
+
+    return hex_color
 
 def generate_palette_image(palette: Palette) -> File:
     """
@@ -130,11 +170,6 @@ def generate_palette_image(palette: Palette) -> File:
 
     return image_file
 
-def generate_embed() -> Embed:
-    # TODO
-    pass
-
-
 def generate_hitcircle(rgb_color: tuple, combo_number: int) -> Image.Image:
     hitcircle = Image.open(r"assets\hitcircle\hitcircle@2x.png")
     overlay = Image.open(r"assets\hitcircle\hitcircleoverlay@2x.png")
@@ -155,7 +190,6 @@ def generate_hitcircle(rgb_color: tuple, combo_number: int) -> Image.Image:
     generate_number(combo_number, img)
 
     return img
-
 
 def generate_number(combo_number: int, base_image: Image.Image) -> Image.Image:
 

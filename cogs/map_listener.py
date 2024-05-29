@@ -62,6 +62,7 @@ class BeatmapView(ui.View):
     def __init__(self, beatmapset: Beatmapset, beatmap: Beatmap):
         super().__init__()
 
+        self.add_item(ui.Button(label="Map Info", style=ButtonStyle.url, url=beatmap.url))
         self.add_item(ui.Button(label="Map Discussion", style=ButtonStyle.url, url=f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion"))
 
 def setup(bot: commands.InteractionBot):

@@ -3,15 +3,15 @@ from ossapi import Beatmapset, Beatmap, GameMode
 from ossapi.enums import RankStatus
 from Pylette import extract_colors, Color
 
-def create(map: Beatmap, beatmapset: Beatmapset) -> Embed:
+def create(beatmap: Beatmap, beatmapset: Beatmapset) -> Embed:
     """
     Create an embed with information about the given beatmap and beatmapset.
     """
     embed = Embed()
 
     # Convert drain time to minutes and seconds
-    minutes = map.hit_length // 60
-    seconds = map.hit_length % 60
+    minutes = beatmap.hit_length // 60
+    seconds = beatmap.hit_length % 60
     formatted_drain_time = f"{minutes}:{seconds:02d}"
 
     # Set the cover image for the embed
@@ -41,19 +41,19 @@ def create(map: Beatmap, beatmapset: Beatmapset) -> Embed:
 
     # Set the title, URL, and description of the embed
     embed.title = f"{beatmapset.artist} - {beatmapset.title}"
-    embed.url = map.url
+    embed.url = beatmap.url
     embed.description = (
         f"**❤️ Favs: ``{beatmapset.favourite_count}`` | ▶️ Playcounts: ``{beatmapset.play_count}``**\n\n"
-        f"{get_diff_emoji(map.difficulty_rating, map.mode)} **{map.version}** ``{map.difficulty_rating}`` ⭐\n\n"
+        f"{get_diff_emoji(beatmap.difficulty_rating, beatmap.mode)} **{beatmap.version}** ``{beatmap.difficulty_rating}`` ⭐\n\n"
         f"**⏱️ Drain time: ``{formatted_drain_time}`` | 🎶 BPM: ``{beatmapset.bpm}``**"
     )
 
     # Add field for difficulty settings
     diff_settings_str = (
-        f"AR: ``{map.ar}`` \n"
-        f"CS: ``{map.cs}`` \n"
-        f"HP: ``{map.drain}`` \n"
-        f"OD: ``{map.accuracy}``"
+        f"AR: ``{beatmap.ar}`` \n"
+        f"CS: ``{beatmap.cs}`` \n"
+        f"HP: ``{beatmap.drain}`` \n"
+        f"OD: ``{beatmap.accuracy}``"
     )
     embed.add_field(name="Diff settings:", value=diff_settings_str, inline=True)
 
@@ -82,7 +82,7 @@ def create(map: Beatmap, beatmapset: Beatmapset) -> Embed:
         GameMode.TAIKO: "Taiko",
         GameMode.CATCH: "Catch the Beat",
         GameMode.MANIA: "Mania"
-    }.get(map.mode, "Unknown")
+    }.get(beatmap.mode, "Unknown")
     embed.add_field(name="Gamemode:", value=gamemode_name, inline=True)
 
     # Determine and set the footer based on the beatmap status

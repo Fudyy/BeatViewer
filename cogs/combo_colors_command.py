@@ -2,7 +2,7 @@ from disnake import Attachment, ApplicationCommandInteraction as Interaction
 from disnake.ext import commands
 from PIL import Image, ImageDraw2
 
-class ColorPaletteCommand(commands.Cog):
+class ComboColorCommand(commands.Cog):
     """
     A cog that contains a command that sends a color palette image.
     """
@@ -16,6 +16,7 @@ class ColorPaletteCommand(commands.Cog):
         """
         Gets the color palette from an image to use as combo colors on a beatmap.
         """
+
         # Check if the image is a PNG or JPEG file.
         if image.content_type not in ["image/png", "image/jpeg"]:
             await ctx.send("The image must be a PNG or JPEG file.")
@@ -23,5 +24,6 @@ class ColorPaletteCommand(commands.Cog):
 
         await ctx.send("enviaste una imagen!")
 
+
 def setup(bot: commands.InteractionBot):
-    bot.add_cog(ColorPaletteCommand(bot))
+    bot.add_cog(ComboColorCommand(bot))

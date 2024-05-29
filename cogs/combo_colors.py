@@ -41,6 +41,10 @@ class ComboColor(commands.Cog):
         if colors > 10:
             await ctx.send("The number of colors must be 10 or less.", ephemeral=True)
             return
+        
+        if colors < 1:
+            await ctx.send("The number of colors must be 1 or more.", ephemeral=True)
+            return
 
         if image.content_type not in ["image/png", "image/jpeg"]:
             await ctx.send("The image must be a PNG or JPEG file.", ephemeral=True)

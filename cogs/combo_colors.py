@@ -127,7 +127,7 @@ def generate_palette_image(palette: Palette) -> File:
     palette_size = len(palette.colors)
 
     if palette_size <= 5:
-        color_width = IMAGE_WIDTH // palette_size
+        color_width = round(IMAGE_WIDTH / palette_size)
         color_height = IMAGE_HEIGHT
 
         for i, color in enumerate(palette):

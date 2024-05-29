@@ -1,9 +1,10 @@
 import re
 from disnake.ext import commands
-from disnake import Message
+from disnake import Message, ui, ButtonStyle
 from logger.logger import logger
 from main import osu
 from embeds import map_info
+from ossapi import Beatmapset, Beatmap
 
 class MapListener(commands.Cog):
     """
@@ -32,13 +33,13 @@ class MapListener(commands.Cog):
         if map_id:
             try:
                 # it uses the beatmapset endpoit so it can get the language and genre info.
-                mapset = await osu.beatmapset(set_id)
-                beatmap = next((bm for bm in mapset.beatmaps if bm.id == int(map_id)), None)
+                mapset: Beatmapset = await osu.beatmapset(set_id)
+                beatmap: Beatmap = next((bm for bm in mapset.beatmaps if bm.id == int(map_id)), None)
                 # prevent to show a difficulty that doesn't exists (yeah i know that more than someone is gonna hard test the bot)
                 if beatmap:
                     logger.info(f"Sending map info:  MAP ID: {beatmap.id} | CHANNEL: {message.channel.id}")
                     try:
-                        await message.reply(embed=map_info.create(beatmap, mapset))
+                        await message.reply(embed=map_info.create(beatmap, mapset), view=BeatmapView(mapset, beatmap))
                     except Exception as e:
                         logger.error(f"There was an error sending the map info: {e}")
             except:
@@ -47,16 +48,21 @@ class MapListener(commands.Cog):
         # example: https://osu.ppy.sh/beatmapsets/24313
         else:
             try:
-                mapset = await osu.beatmapset(beatmapset_id=set_id)
-                beatmap = max(mapset.beatmaps, key=lambda b: b.difficulty_rating)
+                mapset: Beatmapset = await osu.beatmapset(beatmapset_id=set_id)
+                beatmap: Beatmap = max(mapset.beatmaps, key=lambda b: b.difficulty_rating)
                 logger.info(f"Sending map info:  MAP ID: {beatmap.id} | CHANNEL: {message.channel.id}")
                 try:
-                    await message.reply(embed=map_info.create(beatmap, mapset))
+                    await message.reply(embed=map_info.create(beatmap, mapset), view=BeatmapView(mapset, beatmap))
                 except Exception as e:
                     logger.error(f"There was an error sending the map info: {e}")
             except:
                 pass
-            
+
+class BeatmapView(ui.View):
+    def __init__(self, beatmapset: Beatmapset, beatmap: Beatmap):
+        super().__init__()
+
+        self.add_item(ui.Button(label="Map Discussion", style=ButtonStyle.url, url=f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion"))
 
 def setup(bot: commands.InteractionBot):
     bot.add_cog(MapListener(bot))

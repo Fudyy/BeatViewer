@@ -56,57 +56,61 @@ def generate_palette_image(palette: Palette) -> Image.Image:
     """
     Generate an image containing the colors in the given palette.
     """
+
     IMAGE_WIDTH = 1280
     IMAGE_HEIGHT = 768
 
-    palette_size = len(palette.colors)
+    # Hit circle image is 256x256!!
 
     img = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT), (0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    # Draw the colors in the palette on the image
+    palette_size = len(palette.colors)
+
     if palette_size <= 5:
         color_width = IMAGE_WIDTH // palette_size
         color_height = IMAGE_HEIGHT
 
         for i, color in enumerate(palette):
-            draw.rectangle(
-                [(i * color_width, 0), ((i + 1) * color_width, color_height)],
-                fill=color.rgb
-            )
+            x_start = i * color_width
+            x_end = (i + 1) * color_width
+
+            draw.rectangle([(x_start, 0), (x_end, color_height)], fill=color.rgb)
 
             hitcircle = generate_hitcircle(color.rgb, i+1)
-            color_center = (i * color_width) + color_width // 2
+
+            color_center = x_start + color_width // 2
             img.paste(hitcircle, (color_center - 128, (color_height//3)), mask=hitcircle)
-            
+
+    # If the palette has more than 5 colors, draw the first 5 colors on the top half of the image and the rest on the bottom half
     else:
-        # If the palette has more than 5 colors, draw the first 5 colors on the top half of the image and the rest on the bottom half
         top_color_width = IMAGE_WIDTH // 5
         bottom_color_width = IMAGE_WIDTH // (palette_size - 5)
 
         color_height = IMAGE_HEIGHT // 2
 
         for i, color in enumerate(palette):
-            # Top half
             if i < 5:
-                draw.rectangle(
-                    [(i * top_color_width, 0), ((i + 1) * top_color_width, color_height)],
-                    fill=color.rgb
-                )
+                # TOP HALF
+                x_start = i * top_color_width
+                x_end = (i + 1) * top_color_width
+
+                draw.rectangle([(x_start, 0), (x_end, color_height)], fill=color.rgb)
 
                 hitcircle = generate_hitcircle(color.rgb, i+1)
-                color_center = (i * top_color_width) + top_color_width // 2
+
+                color_center = x_start + top_color_width // 2
                 img.paste(hitcircle, (color_center - 128, (color_height // 2) - 128), mask=hitcircle)
-
-            # Bottom half
             else:
-                draw.rectangle(
-                    [((i - 5) * bottom_color_width, color_height), ((i - 4) * bottom_color_width, color_height * 2)],
-                    fill=color.rgb
-                )
-                
+                # BOTTOM HALF
+                x_start = (i - 5) * bottom_color_width
+                x_end = (i - 4) * bottom_color_width
+
+                draw.rectangle([(x_start, color_height), (x_end, color_height * 2)], fill=color.rgb)
+
                 hitcircle = generate_hitcircle(color.rgb, i+1)
-                color_center = ((i - 5) * bottom_color_width) + bottom_color_width // 2
+
+                color_center = x_start + bottom_color_width // 2
                 img.paste(hitcircle, (color_center - 128, ((color_height // 2) * 3) - 128), mask=hitcircle)
 
     return img

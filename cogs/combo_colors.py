@@ -54,19 +54,14 @@ class ComboColor(commands.Cog):
             sort_mode=sort_mode
         )
 
-        palette_image = generate_palette_image(color_palette)
-        image_byte_array = io.BytesIO()
-        palette_image.save(image_byte_array, format="PNG")
-        image_byte_array.seek(0)
-        image_file = File(image_byte_array, filename="palette.png")
-        await ctx.send(embed=Embed().set_image(file=image_file).set_thumbnail(url=image.url))
+        await ctx.send(embed=Embed().set_image(file=generate_palette_image(color_palette)).set_thumbnail(url=image.url))
 
 
 def setup(bot: commands.InteractionBot):
     bot.add_cog(ComboColor(bot))
 
 
-def generate_palette_image(palette: Palette) -> Image.Image:
+def generate_palette_image(palette: Palette) -> File:
     """
     Generate an image containing the colors in the given palette.
     """
@@ -127,7 +122,13 @@ def generate_palette_image(palette: Palette) -> Image.Image:
                 color_center = x_start + bottom_color_width // 2
                 img.paste(hitcircle, (color_center - 128, ((color_height // 2) * 3) - 128), mask=hitcircle)
 
-    return img
+    # Save the image to a disnake File object
+    image_byte_array = io.BytesIO()
+    img.save(image_byte_array, format="PNG")
+    image_byte_array.seek(0)
+    image_file = File(image_byte_array, filename="palette.png")
+
+    return image_file
 
 def generate_embed() -> Embed:
     # TODO

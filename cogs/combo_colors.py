@@ -134,7 +134,7 @@ def generate_palette_image(palette: Palette) -> File:
     # If the palette has more than 5 colors, draw the first 5 colors on the top half of the image and the rest on the bottom half
     else:
         top_color_width = IMAGE_WIDTH // 5
-        bottom_color_width = IMAGE_WIDTH // (palette_size - 5)
+        bottom_color_width = round(IMAGE_WIDTH / (palette_size - 5))
 
         color_height = IMAGE_HEIGHT // 2
 

@@ -50,15 +50,21 @@ class ComboColor(commands.Cog):
             await ctx.send("The image must be a PNG or JPEG file.", ephemeral=True)
             return
 
-        color_palette: Palette = extract_colors(
-            image_url=image.url,
-            palette_size=colors,
-            resize=True,
-            mode="MC",
-            sort_mode=sort_mode
-        )
+        logger.info(f"Requested color palette: USER: %s | CHANNEL: %s | IMAGE: %s", ctx.author.id, ctx.channel.id, image.url)
 
-        await ctx.send(embed=generate_embed(color_palette, image.url, sort_mode))
+        try:
+            color_palette: Palette = extract_colors(
+                image_url=image.url,
+                palette_size=colors,
+                resize=True,
+                mode="MC",
+                sort_mode=sort_mode
+            )
+
+            await ctx.send(embed=generate_embed(color_palette, image.url, sort_mode))
+        except Exception as e:
+            logger.error(f"Error generating color palette: %s", e)
+            await ctx.send("An error occurred while generating the color palette. Please try again later.", ephemeral=True)
 
 
 def setup(bot: commands.InteractionBot):
@@ -80,7 +86,7 @@ def generate_embed(color_palette: Palette, original_image_url: str, sort_mode: s
 
     for i, color in enumerate(color_palette.colors):
         color_index += f"Color {i+1}: \n"
-        color_rgb += f"({color.rgb[0]}, {color.rgb[1]}, {color.rgb[2]})\n"
+        color_rgb += f"{color.rgb[0]:<3}, {color.rgb[1]:<3}, {color.rgb[2]:<3}\n"
         color_hex += f"{rgb_to_hex(color.rgb)}\n"
 
     embed.add_field(name="Colors:", value=color_index, inline=True)

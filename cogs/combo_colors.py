@@ -33,7 +33,7 @@ class ComboColor(commands.Cog):
                 OptionChoice(name="Luminance", value="luminance")
             ],
             default="frequency",
-            name="sort mode",
+            name="sort_mode",
             description="The color sorting mode of the palette. (default: frequency)"
         ),
     ):

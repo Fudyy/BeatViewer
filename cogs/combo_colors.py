@@ -1,8 +1,9 @@
 import io
+from typing import List
 from disnake import Attachment, Embed, File, OptionChoice, Colour, ApplicationCommandInteraction as Interaction
 from disnake.ext import commands
 from PIL import Image, ImageDraw
-from Pylette import extract_colors, Palette
+from Pylette import extract_colors, Palette, Color
 from logger.logger import logger
 
 
@@ -32,6 +33,7 @@ class ComboColor(commands.Cog):
                 OptionChoice(name="Luminance", value="luminance")
             ],
             default="frequency",
+            name="sort mode",
             description="The color sorting mode of the palette. (default: frequency)"
         ),
     ):
@@ -53,13 +55,23 @@ class ComboColor(commands.Cog):
         logger.info(f"Requested color palette: USER: %s | CHANNEL: %s | IMAGE: %s", ctx.author.id, ctx.channel.id, image.url)
 
         try:
-            color_palette: Palette = extract_colors(
+            generated_palette: Palette = extract_colors(
                 image_url=image.url,
-                palette_size=colors,
+                palette_size=30,
                 resize=True,
                 mode="MC",
-                sort_mode=sort_mode
+                sort_mode="frecuency"
             )
+
+            # filter colors by ranking criteria luminance
+            color_palette = filter_colors(generated_palette, colors)
+            if len(color_palette) < colors:
+                await ctx.send("The image does not contain enough colors to generate the requested palette (filtered by ranking criteria).", ephemeral=True)
+                return
+            
+            # sort colors by luminance if requested
+            if sort_mode == "luminance":
+                color_palette.sort(key=lambda color: color.luminance)
 
             await ctx.send(embed=generate_embed(color_palette, image.url, sort_mode))
         except Exception as e:
@@ -84,7 +96,7 @@ def generate_embed(color_palette: Palette, original_image_url: str, sort_mode: s
     color_rgb = ""
     color_hex = ""
 
-    for i, color in enumerate(color_palette.colors):
+    for i, color in enumerate(color_palette):
         color_index += f"Color {i+1}: \n"
         color_rgb += f"{color.rgb[0]:<3}, {color.rgb[1]:<3}, {color.rgb[2]:<3}\n"
         color_hex += f"{rgb_to_hex(color.rgb)}\n"
@@ -111,6 +123,21 @@ def rgb_to_hex(rgb: tuple) -> str:
 
     return hex_color
 
+def filter_colors(generated_palette: Palette, colors: int) -> List[Color]:
+    """
+    Filter out colors that are too dark or too bright by ranking criteria.
+    https://osu.ppy.sh/wiki/en/Ranking_criteria/osu! (section overall/guidelines)
+    """
+    color_palette: List[Color] = []
+    for color in generated_palette.colors:
+        luminance = color.luminance
+        if luminance < 50 or luminance > 220:
+            continue
+        color_palette.append(color)
+        if len(color_palette) == colors:
+            break
+    return color_palette
+
 def generate_palette_image(palette: Palette) -> File:
     """
     Generate an image containing the colors in the given palette.
@@ -124,7 +151,7 @@ def generate_palette_image(palette: Palette) -> File:
     img = Image.new("RGB", (IMAGE_WIDTH, IMAGE_HEIGHT), (0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    palette_size = len(palette.colors)
+    palette_size = len(palette)
 
     if palette_size <= 5:
         color_width = round(IMAGE_WIDTH / palette_size)

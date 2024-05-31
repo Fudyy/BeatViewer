@@ -9,10 +9,10 @@ from sys import exit
 
 load_dotenv()
 
-TOKEN = environ["TOKEN"]
-OSU_ID = environ["OSU-ID"]
-OSU_SECRET = environ["OSU-SECRET"]
-OSU_CALLBACK = environ["OSU-CALLBACK"]
+TOKEN = environ.get("TOKEN")
+OSU_ID = environ.get("OSU-ID")
+OSU_SECRET = environ.get("OSU-SECRET")
+OSU_CALLBACK = environ.get("OSU-CALLBACK")
 
 if TOKEN is None:
     logger.error("No discord token provided on environment variables.")

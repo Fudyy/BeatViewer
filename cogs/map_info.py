@@ -37,7 +37,7 @@ class MapInfo(commands.Cog):
                 beatmap: Beatmap = next((bm for bm in mapset.beatmaps if bm.id == int(map_id)), None)
                 # prevent to show a difficulty that doesn't exists (yeah i know that more than someone is gonna hard test the bot)
                 if beatmap:
-                    logger.info(f"Sending map info:  MAP ID: {beatmap.id} | CHANNEL: {message.channel.id}")
+                    logger.info(f"Sending map info:  USER: {message.author.id} | MAP ID: {beatmap.id} | CHANNEL: {message.channel.id}")
                     try:
                         await message.reply(embed=generate_embed(beatmap, mapset), view=BeatmapView(mapset, beatmap))
                     except Exception as e:

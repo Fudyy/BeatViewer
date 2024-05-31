@@ -55,18 +55,22 @@ class ComboColor(commands.Cog):
         logger.info(f"Requested color palette: USER: %s | CHANNEL: %s | IMAGE: %s", ctx.author.id, ctx.channel.id, image.url)
 
         try:
-            generated_palette: Palette = extract_colors(
-                image_url=image.url,
-                palette_size=30,
-                resize=True,
-                mode="MC",
-                sort_mode="frecuency"
-            )
-
-            # filter colors by ranking criteria luminance
-            color_palette = filter_colors(generated_palette, colors)
-            if len(color_palette) < colors:
-                await ctx.send("The image does not contain enough colors to generate the requested palette (filtered by ranking criteria).", ephemeral=True)
+            # extract and filter colors by ranking criteria luminance
+            # https://osu.ppy.sh/wiki/en/Ranking_criteria/osu!
+            try:
+                generated_palette: Palette = extract_colors(
+                    image_url=image.url,
+                    palette_size=30,
+                    resize=True,
+                    mode="MC",
+                    sort_mode="frecuency"
+                )
+                color_palette = filter_colors(generated_palette, colors)
+                if len(color_palette) < colors:
+                    await ctx.send("The image does not contain enough colors fulfilling the ranking criteria to generate the requested palette.", ephemeral=True)
+                    return
+            except:
+                await ctx.send("The image does not contain enough colors fulfilling the ranking criteria to generate the requested palette.", ephemeral=True)
                 return
             
             # sort colors by luminance if requested
@@ -74,6 +78,7 @@ class ComboColor(commands.Cog):
                 color_palette.sort(key=lambda color: color.luminance)
 
             await ctx.send(embed=generate_embed(color_palette, image.url, sort_mode))
+
         except Exception as e:
             logger.error(f"Error generating color palette: %s", e)
             await ctx.send("An error occurred while generating the color palette. Please try again later.", ephemeral=True)

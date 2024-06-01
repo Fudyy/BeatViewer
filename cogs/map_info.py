@@ -1,6 +1,6 @@
 import re
 from disnake.ext import commands
-from disnake import Message, ui, ButtonStyle, Embed, Colour
+from disnake import Message, ui, ButtonStyle, Embed, Colour, ApplicationCommandInteraction as Interaction
 from logger.logger import logger
 from main import osu
 from ossapi import Beatmapset, Beatmap, GameMode
@@ -15,6 +15,27 @@ class MapInfo(commands.Cog):
     def __init__(self, bot: commands.InteractionBot):
         self.bot = bot
         self.map_regex = r"https:\/\/osu\.ppy\.sh\/beatmapsets\/(\d+)(?:#\w+\/(\d+))?"
+
+    @commands.slash_command(name="beatmap")
+    async def beatmap(self, inter: Interaction):
+        """
+        beatmaps command group.
+        """
+        pass
+
+    @beatmap.sub_command(name="search",
+                         description="Search for a beatmap by its name.")
+    async def search(self, ctx: Interaction, query: str = commands.Param(description="The query to search for.")):
+        """
+        Search for a beatmap by its name.
+        """
+        result = await osu.search_beatmapsets(query=query)
+        beatmapsets = result.beatmapsets[:5]
+        texto = ""
+        for beatmap in beatmapsets:
+            texto += f"**{beatmap.artist} - {beatmap.title} by {beatmap.creator}**\n"
+        await ctx.send(texto)
+
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):

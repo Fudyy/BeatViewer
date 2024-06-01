@@ -1,11 +1,14 @@
 import re
+from typing import Coroutine
 from disnake.ext import commands
-from disnake import Message, ui, ButtonStyle, Embed, Colour, ApplicationCommandInteraction as Interaction
+from disnake import Message, MessageInteraction, ui, ButtonStyle, Embed, Colour, SelectOption, ApplicationCommandInteraction as Interaction
 from logger.logger import logger
 from main import osu
-from ossapi import Beatmapset, Beatmap, GameMode
+from ossapi import Beatmapset, Beatmap, GameMode, BeatmapsetSearchResult
 from ossapi.enums import RankStatus
 from Pylette import extract_colors, Color
+
+osu = osu
 
 class MapInfo(commands.Cog):
     """
@@ -25,16 +28,14 @@ class MapInfo(commands.Cog):
 
     @beatmap.sub_command(name="search",
                          description="Search for a beatmap by its name.")
-    async def search(self, ctx: Interaction, query: str = commands.Param(description="The query to search for.")):
+    async def search(self, inter: Interaction, query: str = commands.Param(description="The query to search for.")):
         """
         Search for a beatmap by its name.
         """
+        logger.info(f"Sending search results:  USER: {inter.user.id} | CHANNEL: {inter.channel_id} | QUERY: {query}")
         result = await osu.search_beatmapsets(query=query)
-        beatmapsets = result.beatmapsets[:5]
-        texto = ""
-        for beatmap in beatmapsets:
-            texto += f"**{beatmap.artist} - {beatmap.title} by {beatmap.creator}**\n"
-        await ctx.send(texto)
+        beatmaps = result.beatmapsets[:5]
+        await inter.response.send_message(view=BeatmapSelector(beatmaps, inter))
 
 
     @commands.Cog.listener()
@@ -88,6 +89,32 @@ class BeatmapView(ui.View):
 
         self.add_item(ui.Button(label="Map Info", style=ButtonStyle.url, url=beatmap.url))
         self.add_item(ui.Button(label="Map Discussion", style=ButtonStyle.url, url=f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion"))
+
+class BeatmapSelector(ui.View):
+    def __init__(self, beatmaps, original_interaction):
+        super().__init__(timeout=15)
+
+        self.add_item(BeatmapSearchSelector(beatmaps, original_interaction))
+
+class BeatmapSearchSelector(ui.StringSelect):
+    def __init__(self, beatmaps, original_interaction):
+        self.original_interaction = original_interaction
+        options = []
+        for beatmapset in beatmaps:
+            options.append(SelectOption(label=f"{beatmapset.artist} - {beatmapset.title}", 
+                                        value=beatmapset.id,
+                                        description=f"by {beatmapset.creator}"))
+
+        super().__init__(placeholder="Search results...", options=options)
+    
+    async def callback(self, interaction: MessageInteraction):
+        if interaction.user.id != self.original_interaction.user.id:
+            return await interaction.response.send_message("You can't use this select!!.", ephemeral=True)
+        
+        beatmapset: Beatmapset = await osu.beatmapset(beatmapset_id=self.values[0])
+        beatmap: Beatmap = max(beatmapset.beatmaps, key=lambda b: b.difficulty_rating)
+        logger.info(f"Sending map info:  MAP ID: {beatmap.id} | CHANNEL: {interaction.channel.id}")
+        return await interaction.response.edit_message(embed=generate_embed(beatmap, beatmapset), view=BeatmapView(beatmapset, beatmap))
 
 def generate_embed(beatmap: Beatmap, beatmapset: Beatmapset) -> Embed:
     """

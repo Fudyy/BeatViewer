@@ -1,10 +1,10 @@
 import re
 from typing import Coroutine
 from disnake.ext import commands
-from disnake import Message, MessageInteraction, ui, ButtonStyle, Embed, Colour, SelectOption, ApplicationCommandInteraction as Interaction
+from disnake import Message, MessageInteraction, ui, ButtonStyle, Embed, Colour, SelectOption, OptionChoice, ApplicationCommandInteraction as Interaction
 from logger.logger import logger
 from main import osu
-from ossapi import Beatmapset, Beatmap, GameMode, BeatmapsetSearchResult
+from ossapi import Beatmapset, Beatmap, GameMode
 from ossapi.enums import RankStatus
 from Pylette import extract_colors, Color
 
@@ -25,15 +25,36 @@ class MapInfo(commands.Cog):
         beatmaps command group.
         """
         pass
-
+    
     @beatmap.sub_command(name="search",
                          description="Search for a beatmap by its name.")
-    async def search(self, inter: Interaction, query: str = commands.Param(description="The query to search for.")):
+    async def search(self, inter: Interaction, 
+                     query: str = commands.Param(description="The query to search for."),
+                     category = commands.Param(description="The category to search in.",
+                                                default="any",
+                                                choices=[OptionChoice(name="Any", value="any"),
+                                                        OptionChoice(name="Has Leaderboard", value="leaderboard"),
+                                                        OptionChoice(name="Ranked", value="ranked"),
+                                                        OptionChoice(name="Qualified", value="qualified"),
+                                                        OptionChoice(name="Loved", value="loved"),
+                                                        OptionChoice(name="Pending", value="pending"),
+                                                        OptionChoice(name="WIP", value="wip"),
+                                                        OptionChoice(name="Graveyard", value="graveyard")]),
+                    mode = commands.Param(description="The game mode to search in.",
+                                          default="-1",
+                                        choices=[OptionChoice(name="osu!", value="0"),
+                                                OptionChoice(name="Taiko", value="1"),
+                                                OptionChoice(name="Catch the Beat", value="2"),
+                                                OptionChoice(name="Mania", value="3"),
+                                                OptionChoice(name="All", value="-1")])):
         """
         Search for a beatmap by its name.
         """
         logger.info(f"Sending search results:  USER: {inter.user.id} | CHANNEL: {inter.channel_id} | QUERY: {query}")
-        result = await osu.search_beatmapsets(query=query)
+        result = await osu.search_beatmapsets(query=query, category=category, mode=int(mode), explicit_content="show")
+        if not result.beatmapsets:
+            await inter.response.send_message(f"**No results found for: QUERY:** {query} **| CATEGORIES:** {category.capitalize()}", ephemeral=True)
+            return
         beatmaps = result.beatmapsets[:5]
         await inter.response.send_message(view=BeatmapSelector(beatmaps, inter))
 

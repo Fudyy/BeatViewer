@@ -121,10 +121,19 @@ class BeatmapSearchSelector(ui.StringSelect):
     def __init__(self, beatmaps, original_interaction):
         self.original_interaction = original_interaction
         options = []
+        map_status = {
+            RankStatus.GRAVEYARD: "Graveyard",
+            RankStatus.WIP: "WIP",
+            RankStatus.PENDING: "Pending",
+            RankStatus.RANKED: "Ranked",
+            RankStatus.APPROVED: "Approved",
+            RankStatus.QUALIFIED: "Qualified",
+            RankStatus.LOVED: "Loved"
+        }
         for beatmapset in beatmaps:
             options.append(SelectOption(label=f"{beatmapset.artist} - {beatmapset.title}", 
                                         value=beatmapset.id,
-                                        description=f"by {beatmapset.creator}"))
+                                        description=f"Status: {map_status.get(beatmapset.status, "Unknown")}  by {beatmapset.creator}"))
 
         super().__init__(placeholder="Search results...", options=options)
     

@@ -143,27 +143,31 @@ def generate_embed(beatmap: Beatmap, beatmapset: Beatmapset) -> Embed:
     """
     embed = Embed()
 
+    # Extract and set the dominant color from the cover image
+    try:
+        bg_color_extract: Color = extract_colors(
+            image_url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg",
+            palette_size=10,
+            resize=False,
+            mode="MC",
+            sort_mode="frequency"
+        )[0]
+
+        bg_color = Colour.from_rgb(int(bg_color_extract.rgb[0]), int(bg_color_extract.rgb[1]), int(bg_color_extract.rgb[2]))
+        # Set the cover image for the embed
+        embed.set_image(url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg")
+    except:
+        bg_color = Colour.light_gray()
+        embed.set_image(url=f"https://osu.ppy.sh/assets/images/default-bg.7594e945.png")
+
     # Convert drain time to minutes and seconds
     minutes = beatmap.hit_length // 60
     seconds = beatmap.hit_length % 60
     formatted_drain_time = f"{minutes}:{seconds:02d}"
 
-    # Set the cover image for the embed
-    embed.set_image(url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg")
-
     # Set the thumbnail image for the embed
     embed.set_thumbnail(url=f"https://a.ppy.sh/{beatmapset.user_id}")
-
-    # Extract and set the dominant color from the cover image
-    bg_color_extract: Color = extract_colors(
-        image_url=f"https://assets.ppy.sh/beatmaps/{beatmapset.id}/covers/cover@2x.jpg",
-        palette_size=10,
-        resize=False,
-        mode="MC",
-        sort_mode="frequency"
-    )[0]
     
-    bg_color = Colour.from_rgb(int(bg_color_extract.rgb[0]), int(bg_color_extract.rgb[1]), int(bg_color_extract.rgb[2]))
     embed.color = bg_color
 
     # Set the author section of the embed

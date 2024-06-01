@@ -27,11 +27,11 @@ class MapInfo(commands.Cog):
         pass
     
     @beatmap.sub_command(name="search",
-                         description="Search for a beatmap by its name.")
+                         description="Search for a beatmap.")
     async def search(self, inter: Interaction, 
                      query: str = commands.Param(description="The query to search for."),
                      category = commands.Param(description="The category to search in.",
-                                                default="any",
+                                                default="leaderboard",
                                                 choices=[OptionChoice(name="Any", value="any"),
                                                         OptionChoice(name="Has Leaderboard", value="leaderboard"),
                                                         OptionChoice(name="Ranked", value="ranked"),

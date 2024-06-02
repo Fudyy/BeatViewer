@@ -8,8 +8,6 @@ from ossapi import Beatmapset, Beatmap, GameMode
 from ossapi.enums import RankStatus
 from Pylette import extract_colors, Color
 
-osu = osu
-
 class MapInfo(commands.Cog):
     """
     A cog that provides commands for retrieving information about osu! beatmaps.

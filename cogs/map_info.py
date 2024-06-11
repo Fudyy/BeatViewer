@@ -108,6 +108,7 @@ class BeatmapView(ui.View):
 
         self.add_item(ui.Button(label="Map Info", style=ButtonStyle.url, url=beatmap.url))
         self.add_item(ui.Button(label="Map Discussion", style=ButtonStyle.url, url=f"https://osu.ppy.sh/beatmapsets/{beatmapset.id}/discussion"))
+        self.add_item(ui.Button(label="Download", style=ButtonStyle.url, url=f"https://api.nerinyan.moe/d/{beatmapset.id}"))
 
 class BeatmapSelector(ui.View):
     def __init__(self, beatmaps, original_interaction):
